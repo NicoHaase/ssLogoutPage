@@ -1,24 +1,30 @@
 <?php
-/*
- * TODO: only show the Logout-Link when user is logged in
- */
-
 class LogoutPage extends SiteTree {
-	function getCMSFields() {
+	public function getCMSFields() {
 		$fields = parent::getCMSFields();
-		$fields->removeFieldFromTab("Root.Main","Content");
-		$fields->removeFieldFromTab("Root", "Metadata");
+		$fields->removeFieldFromTab( "Root.Main","Content" );
+		$fields->removeFieldFromTab( "Root", "Metadata" );
 		return $fields;
+	}
+	
+	public function canView($member = null) {
+		$member = Member::currentUser();
+		return ( $member instanceof Member );
 	}
 }
 
 class LogoutPage_Controller extends ContentController {
-	function init() {
+	public function init() {
 		parent::init();
 		
-		if ( $member ) $member->logOut();
-		$link = RootURLController::get_homepage_link();
-		$this->redirect( $link . '/');
+		$member = Member::currentUser();
+		if ( $member ) {
+			$member->logOut();
+			$link = RootURLController::get_homepage_link();
+			$this->redirect( $link . '/');
+		} else {
+			$this->redirectBack();
+		}
 		return;
 	}
 }
